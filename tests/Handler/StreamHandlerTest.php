@@ -544,7 +544,7 @@ class StreamHandlerTest extends TestCase
         self::assertEquals(3, $req->getHeaderLine('Content-Length'));
     }
 
-    public function testAddsContentLengthEvenWhenEmpty()
+    public function testAddsContentLengthForPUTEvenWhenEmpty()
     {
         $this->queueRes();
         $handler = new StreamHandler();
@@ -552,6 +552,26 @@ class StreamHandlerTest extends TestCase
         $handler($request, []);
         $req = Server::received()[0];
         self::assertEquals(0, $req->getHeaderLine('Content-Length'));
+    }
+
+    public function testAddsContentLengthForPOSTEvenWhenEmpty()
+    {
+        $this->queueRes();
+        $handler = new StreamHandler();
+        $request = new Request('POST', Server::$url, [], '');
+        $handler($request, []);
+        $req = Server::received()[0];
+        self::assertEquals(0, $req->getHeaderLine('Content-Length'));
+    }
+
+    public function testDontAddContentLengthForGETEvenWhenEmpty()
+    {
+        $this->queueRes();
+        $handler = new StreamHandler();
+        $request = new Request('GET', Server::$url, [], '');
+        $handler($request, []);
+        $req = Server::received()[0];
+        self::assertSame('', $req->getHeaderLine('Content-Length'));
     }
 
     public function testSupports100Continue()
